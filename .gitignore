@@ -1,0 +1,28 @@
+# Local config — never commit credentials
+.env
+
+# Local backups — use git history instead
+backups/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+*.csv
+shopee_reviews/
+lazada_reviews/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Temp CSVs — you drop these in manually and they get processed
+# Remove this line if you want to version-control the CSVs too
+input/lazada_reviews/*.csv
