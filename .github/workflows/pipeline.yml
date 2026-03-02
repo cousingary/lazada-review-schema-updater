@@ -1,9 +1,9 @@
 name: Waking Cup Review Pipeline
 
 on:
-  # Run daily at 9am Bangkok time (UTC+7 = 02:00 UTC)
+  # Run daily at 9am Bangkok time (UTC+7 = 03:33 UTC)
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '33 3 * * *'
 
   # Also allow manual trigger from GitHub UI (Actions tab → Run workflow)
   workflow_dispatch:
@@ -55,6 +55,20 @@ jobs:
           SKIP_DEPLOY:  ${{ github.event.inputs.skip_deploy || 'false' }}
 
         run: python pipeline.py
+
+      - name: Clear WordPress stats cache via WP-CLI
+        # Busts the wakingcup_store_stats transient so badges update immediately
+        # Requires WP-CLI installed on the server — skip if not available
+        continue-on-error: true
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host:     ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USER }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          port:     ${{ secrets.SFTP_PORT }}
+          script: |
+            cd /home/u797980862/domains/jeremylamkin.com/public_html
+            wp transient delete wakingcup_store_stats --allow-root || true
 
       - name: Commit updated schema files back to repo
         # Only commits if files actually changed (avoids empty commits)
