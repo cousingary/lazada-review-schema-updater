@@ -3,7 +3,7 @@ name: Waking Cup Review Pipeline
 on:
   # Run daily at 9am Bangkok time (UTC+7 = 02:00 UTC)
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '33 3 * * *'
 
   # Also allow manual trigger from GitHub UI (Actions tab → Run workflow)
   workflow_dispatch:
