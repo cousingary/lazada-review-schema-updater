@@ -1,0 +1,72 @@
+name: Waking Cup Review Pipeline
+
+on:
+  # Run daily at 9am Bangkok time (UTC+7 = 02:00 UTC)
+  schedule:
+    - cron: '33 3 * * *'
+
+  # Also allow manual trigger from GitHub UI (Actions tab → Run workflow)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (no files written or uploaded)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+      skip_deploy:
+        description: 'Skip SFTP deploy (import + ratings only)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install paramiko
+
+      - name: Run pipeline
+        env:
+          # Directories (relative to repo root on the runner)
+          BASE_DIR:    ${{ github.workspace }}
+          CSV_DIR:     ${{ github.workspace }}/input/lazada_reviews
+          SCHEMA_DIR:  ${{ github.workspace }}/product-schema
+          BACKUP_DIR:  ${{ github.workspace }}/backups
+
+          # SFTP credentials — set these in GitHub → Settings → Secrets
+          # Remote paths are hardcoded in sftp_deploy.py (confirmed with operator)
+          SFTP_HOST:     ${{ secrets.SFTP_HOST }}
+          SFTP_PORT:     ${{ secrets.SFTP_PORT }}
+          SFTP_USER:     ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+
+          # Pipeline flags (from manual trigger inputs, or default false)
+          DRY_RUN:      ${{ github.event.inputs.dry_run || 'false' }}
+          SKIP_DEPLOY:  ${{ github.event.inputs.skip_deploy || 'false' }}
+
+        run: python pipeline.py
+
+      - name: Commit updated schema files back to repo
+        # Only commit if files actually changed (avoids empty commits)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add product-schema/
+          git diff --staged --quiet || git commit -m "chore: update product schema [$(date '+%Y-%m-%d')]"
+          git push
