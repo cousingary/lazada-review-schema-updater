@@ -3,7 +3,7 @@ name: Waking Cup Review Pipeline
 on:
   # Run daily at 9am Bangkok time (UTC+7 = 02:00 UTC)
   schedule:
-    - cron: '33 3 * * *'
+    - cron: '0 2 * * *'
 
   # Also allow manual trigger from GitHub UI (Actions tab → Run workflow)
   workflow_dispatch:
@@ -61,6 +61,6 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add product-schema/
+          git add product_schema/
           git diff --staged --quiet || git commit -m "chore: update product schema [$(date '+%Y-%m-%d')]"
           git push
