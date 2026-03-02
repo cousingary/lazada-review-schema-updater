@@ -3,7 +3,7 @@ name: Waking Cup Review Pipeline
 on:
   # Run daily at 9am Bangkok time (UTC+7 = 02:00 UTC)
   schedule:
-    - cron: '33 3 * * *'
+    - cron: '0 2 * * *'
 
   # Also allow manual trigger from GitHub UI (Actions tab → Run workflow)
   workflow_dispatch:
@@ -43,14 +43,8 @@ jobs:
 
       - name: Run pipeline
         env:
-          # Directories (relative to repo root on the runner)
-          BASE_DIR:    ${{ github.workspace }}
-          CSV_DIR:     ${{ github.workspace }}/input/lazada_reviews
-          SCHEMA_DIR:  ${{ github.workspace }}/product-schema
-          BACKUP_DIR:  ${{ github.workspace }}/backups
-
           # SFTP credentials — set these in GitHub → Settings → Secrets
-          # Remote paths are hardcoded in sftp_deploy.py (confirmed with operator)
+          # Paths are derived automatically from pipeline.py location — do not set BASE_DIR here
           SFTP_HOST:     ${{ secrets.SFTP_HOST }}
           SFTP_PORT:     ${{ secrets.SFTP_PORT }}
           SFTP_USER:     ${{ secrets.SFTP_USER }}
@@ -63,7 +57,7 @@ jobs:
         run: python pipeline.py
 
       - name: Commit updated schema files back to repo
-        # Only commit if files actually changed (avoids empty commits)
+        # Only commits if files actually changed (avoids empty commits)
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
