@@ -1,0 +1,21 @@
+# Environment and credentials
+.env
+
+# Per-product schema files (live business data)
+product_schema/
+product-schema.json
+
+# Pipeline runtime directories
+backups/
+logs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
