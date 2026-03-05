@@ -1,6 +1,6 @@
-# waking-cup-pipeline
+# Lazada review schema updater
 
-Automated review schema pipeline for [Waking Cup](https://wakingcup.com). Fetches marketplace reviews via API, updates per-product JSON-LD schema files, and deploys them to the production server via SFTP.
+Automated review schema pipeline for Lazada reviews on [Waking Cup](https://wakingcup.com). Fetches marketplace reviews via API, updates per-product JSON-LD schema files, and deploys them to the production server via SFTP.
 
 ---
 
