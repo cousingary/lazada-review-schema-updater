@@ -31,6 +31,7 @@ Runs daily via cron. Can also be triggered manually or in backfill mode.
 ├── pipeline.py           # Orchestrator — runs all four steps in sequence
 ├── api_importer.py       # Review fetch and merge (not included in public repo)
 ├── sftp_deploy.py        # SFTP deploy via paramiko
+├── memory_logger.py      # Second Brain integration — logs run summaries to Supabase
 ├── .env                  # Credentials and config (never committed)
 ├── product_schema/       # Per-product JSON-LD files (one per SKU)
 ├── backups/              # Rolling backups of product_schema/ (last 7 runs)
@@ -82,7 +83,7 @@ Add the contents of `hostinger_key.pub` to your Hostinger SSH Keys panel, then s
 ### 5. Deploy pipeline files
 
 ```bash
-scp pipeline.py sftp_deploy.py your_user@YOUR_VPS_IP:/home/wcpipeline/
+scp pipeline.py sftp_deploy.py memory_logger.py your_user@YOUR_VPS_IP:/home/wcpipeline/
 scp -r product_schema/ your_user@YOUR_VPS_IP:/home/wcpipeline/
 ```
 
@@ -108,7 +109,7 @@ SKIP_DEPLOY=true venv/bin/python pipeline.py
 
 ## Cron
 
-Runs daily at 09:00 Bangkok time (02:00 UTC):
+Runs daily at 10:33 Bangkok time (03:33 UTC):
 
 ```
 33 3 * * * cd /home/wcpipeline && venv/bin/python pipeline.py >> /home/wcpipeline/logs/pipeline.log 2>&1
@@ -129,6 +130,9 @@ See `.env.example` for the full list. Required variables:
 | `SFTP_PORT` | SSH port (Hostinger default: 65002) |
 | `SFTP_USER` | Hostinger SSH username |
 | `SFTP_KEY_PATH` | Path to private key file |
+| `SUPABASE_URL` | Supabase project URL (for Second Brain logging) |
+| `SUPABASE_SERVICE_KEY` | Supabase service role key (for Second Brain logging) |
+| `OPENAI_API_KEY` | OpenAI API key (for Second Brain embeddings) |
 
 ---
 
