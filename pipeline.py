@@ -239,6 +239,16 @@ def main():
     log.info(f"  Master schema     : {master_count} products")
     log.info(f"  Files deployed    : {deploy_result.get('uploaded', 0)}")
 
+    # Log run summary to Second Brain
+    from memory_logger import log_run
+    log_run(
+        new_reviews      = import_result.get("new_reviews", 0),
+        products_updated = ratings_updated,
+        files_deployed   = deploy_result.get("uploaded", 0),
+        skipped          = import_result.get("skipped", []),
+        dry_run          = DRY_RUN,
+    )
+
 
 if __name__ == "__main__":
     main()
